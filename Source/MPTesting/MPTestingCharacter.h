@@ -100,7 +100,14 @@ public:
 	void CallOpenLevel(const FString& Address);
 
 	UFUNCTION(BlueprintCallable)
-	void CallClientTravel(const FString& Address);
+	void CallClientTravel(const FString& Address); 
+
+public:
+
+	// Pointer to online session interface
+	TSharedPtr<class IOnlineSession, ESPMode::ThreadSafe> OnlineSessionInterface;
+
+
 
 
 };

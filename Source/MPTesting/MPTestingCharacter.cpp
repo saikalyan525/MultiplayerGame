@@ -11,6 +11,7 @@
 #include "EnhancedInputSubsystems.h"
 #include "InputActionValue.h"
 #include "MPTesting.h"
+#include "Kismet/GameplayStatics.h"
 
 AMPTestingCharacter::AMPTestingCharacter()
 {
@@ -130,4 +131,30 @@ void AMPTestingCharacter::DoJumpEnd()
 {
 	// signal the character to stop jumping
 	StopJumping();
+}
+
+void AMPTestingCharacter::OpenLobby()
+{
+	UWorld* World = GetWorld();
+	if (World)
+	{
+		World->ServerTravel("/Game/ThirdPerson/Lobby?listen");
+		
+	}
+
+}
+
+void AMPTestingCharacter::CallOpenLevel(const FString& Address)
+{
+	UGameplayStatics::OpenLevel(this, *Address);
+}
+
+void AMPTestingCharacter::CallClientTravel(const FString& Address)
+{
+	APlayerController* PlayerController = GetGameInstance()->GetFirstLocalPlayerController();
+	if(PlayerController)
+	{
+		PlayerController->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
+	}
+
 }

@@ -20,7 +20,8 @@ public class MPTesting : ModuleRules
 			"UMG",
 			"Slate",
 			"OnlineSubsystemSteam",
-			"OnlineSubsystem"
+			"OnlineSubsystem",
+			"OnlineSubsystemUtils"
 		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] { });

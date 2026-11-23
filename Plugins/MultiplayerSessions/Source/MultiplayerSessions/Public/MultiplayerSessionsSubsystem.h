@@ -6,6 +6,7 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include "Interfaces/OnlineSessionInterface.h"
 
+
 #include "MultiplayerSessionsSubsystem.generated.h"
 
 /**
@@ -46,6 +47,7 @@ protected:
 private:
 
 	IOnlineSessionPtr SessionInterface;	
+	TSharedPtr<FOnlineSessionSettings> LastSessionSettings;
 
 	//
 	//  To add to the online session interface delegate list. 

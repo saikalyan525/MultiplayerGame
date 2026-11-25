@@ -5,11 +5,20 @@
 #include "Components/Button.h"
 #include "MultiplayerSessionsSubsystem.h"
 
-void UMenu::MenuSetup()
+void UMenu::MenuSetup(int32 InNumPublicConnections, FString InMatchType)
 {
+	
+	NumPublicConnections = InNumPublicConnections;
+	MatchType = InMatchType;
+
 	AddToViewport();
 	SetVisibility(ESlateVisibility::Visible);
 	bIsEnabled = true;
+
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Menu Widget Added to Screen !"));
+	}
 
 	UWorld* World = GetWorld();
 	if (World)
@@ -21,7 +30,7 @@ void UMenu::MenuSetup()
 			InputModeData.SetWidgetToFocus(TakeWidget());
 			InputModeData.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 			PlayerController->SetInputMode(InputModeData);
-			PlayerController->bShowMouseCursor = true;
+			PlayerController->SetShowMouseCursor(true);
 		}
 	}
 
@@ -55,6 +64,12 @@ bool UMenu::Initialize()
 
 }
 
+void UMenu::NativeDestruct()
+{
+	MenuTearDown();
+	Super::NativeDestruct();
+}
+
 void UMenu::HostButtonClicked()
 {
 	if (GEngine)
@@ -64,7 +79,7 @@ void UMenu::HostButtonClicked()
 
 	if (MultiplayerSessionsSubsystem)
 	{
-		MultiplayerSessionsSubsystem->CreateSession(4, FString("FreeForAll"));
+		MultiplayerSessionsSubsystem->CreateSession(NumPublicConnections, MatchType);
 		UWorld* World = GetWorld();
 		if (World)
 		{
@@ -81,4 +96,24 @@ void UMenu::JoinButtonClicked()
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Join Button Clicked!"));
 	}
+}
+
+void UMenu::MenuTearDown()
+{
+	
+	RemoveFromParent();
+	UWorld* World = GetWorld();
+	if (World)
+	{
+
+		APlayerController* PlayerController = World->GetFirstPlayerController();
+		if (PlayerController)
+		{
+			FInputModeGameOnly InputModeData;
+			PlayerController->SetInputMode(InputModeData);
+			PlayerController->SetShowMouseCursor(false);
+		}
+
+	}
+
 }

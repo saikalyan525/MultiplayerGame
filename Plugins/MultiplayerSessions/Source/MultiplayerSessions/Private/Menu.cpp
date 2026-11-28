@@ -3,6 +3,11 @@
 
 #include "Menu.h"
 #include "Components/Button.h"
+
+#include "Engine/Engine.h"
+#include "Engine/NetDriver.h"
+#include "Engine/World.h"
+
 #include "MultiplayerSessionsSubsystem.h"
 #include "OnlineSessionSettings.h"
 #include "Interfaces/OnlineSessionInterface.h"
@@ -16,7 +21,7 @@ void UMenu::MenuSetup(int32 InNumPublicConnections, FString InMatchType)
 
 	AddToViewport();
 	SetVisibility(ESlateVisibility::Visible);
-	bIsEnabled = true;
+	SetIsEnabled(true);
 
 	if (GEngine)
 	{
@@ -103,7 +108,7 @@ void UMenu::OnCreateSession(bool bWasSuccessful)
 
 			}
 
-			World->ServerTravel("/Game/ThirdPerson/Lobby?listen");
+			World->ServerTravel("/Game/DarkForest/Maps/Demo?listen");
 
 		}
 
@@ -128,6 +133,12 @@ void UMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& SessionResu
 		return;
 	}
 
+	if (GEngine)
+	{
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Yellow, FString::Printf(TEXT("Total Sessions Found: %d"), SessionResults.Num()));
+		GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Yellow, FString::Printf(TEXT("Search Successful: %s"), bWasSuccessful ? TEXT("TRUE") : TEXT("FALSE")));
+	}
+
 	for (auto Result : SessionResults )
 	{
 		FString SettingsValue;
@@ -138,6 +149,17 @@ void UMenu::OnFindSessions(const TArray<FOnlineSessionSearchResult>& SessionResu
 			MultiplayerSessionsSubsystem->JoinSession(Result);
 			return;
 		}
+
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 30.f, FColor::Cyan, TEXT("Inside Session Array!"));
+			GEngine->AddOnScreenDebugMessage(-1, 30.f, FColor::Cyan, FString::Printf(TEXT("Host Name: %s"), *Result.Session.OwningUserName));
+			GEngine->AddOnScreenDebugMessage(-1, 30.f, FColor::Yellow, FString::Printf(TEXT("Found MatchType: %s"), *SettingsValue));
+			GEngine->AddOnScreenDebugMessage(-1, 30.f, FColor::Yellow, FString::Printf(TEXT("Required MatchType: %s"), *MatchType));
+	
+		}
+
+
 	}
 
 }
@@ -160,6 +182,7 @@ void UMenu::OnJoinSession(EOnJoinSessionCompleteResult::Type Result)
 			{
 				PlayerController->ClientTravel(Address, ETravelType::TRAVEL_Absolute);
 			}
+
 			
 		}
 	}
@@ -195,11 +218,34 @@ void UMenu::JoinButtonClicked()
 	if (GEngine)
 	{
 		GEngine->AddOnScreenDebugMessage(-1, 5.f, FColor::Green, TEXT("Join Button Clicked!"));
+
+		for (const FNetDriverDefinition& Definition : GEngine->NetDriverDefinitions)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 30.f, FColor::Cyan, FString::Printf(TEXT("Driver Name: %s"), *Definition.DefName.ToString()));
+			GEngine->AddOnScreenDebugMessage(-1, 30.f, FColor::Yellow, FString::Printf(TEXT("Driver Class: %s"), *Definition.DriverClassName.ToString()));
+			GEngine->AddOnScreenDebugMessage(-1, 30.f, FColor::Yellow, FString::Printf(TEXT("Fallback Class: %s"), *Definition.DriverClassNameFallback.ToString()));
+
+			UE_LOG(LogTemp, Warning, TEXT("NetDriver: %s | Class: %s | Fallback: %s"), *Definition.DefName.ToString(), *Definition.DriverClassName.ToString(), *Definition.DriverClassNameFallback.ToString());
+		}
 	}
+
+
 
 	if (MultiplayerSessionsSubsystem)
 	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Yellow, FString::Printf(TEXT("Searching MatchType: %s"), *MatchType));
+		}
+
 		MultiplayerSessionsSubsystem->FindSessions(10000);
+	}
+	else
+	{
+		if (GEngine)
+		{
+			GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Red, TEXT("MultiplayerSessionsSubsystem Invalid!"));
+		}
 	}
 
 }

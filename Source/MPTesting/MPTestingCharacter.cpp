@@ -67,7 +67,7 @@ AMPTestingCharacter::AMPTestingCharacter():
 
 		if (GEngine)
 		{
-			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Blue, FString::Printf(TEXT("Found subsystem %s"), *OnlineSubsystem->GetSubsystemName().ToString()));
+			GEngine->AddOnScreenDebugMessage(-1, 10.f, FColor::Blue, FString::Printf(TEXT("Found subsystem %s"), *OnlineSubsystem->GetSubsystemName().ToString()));
 		}
 
 	}
@@ -286,7 +286,7 @@ void AMPTestingCharacter::OnFindSessionsComplete(bool bWasSuccessful)
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Cyan, FString::Printf(TEXT("Session Id: %s, User: %s"), *Id, *User));
 		}
-		if(MatchType == "FreeForAll")
+		if(MatchType == "MultiplayerShooterTester")
 		{
 			GEngine->AddOnScreenDebugMessage(-1, 15.f, FColor::Cyan, FString::Printf(TEXT("Joining Match Type: %s"), *MatchType));  
 		}
